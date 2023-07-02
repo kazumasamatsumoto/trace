@@ -34,20 +34,22 @@ export const QrCodeReader: FC<QrCodeReaderProps> = ({ onRead, setOpen }) => {
     mountedRef.current = true;
     const codeReader = new BrowserQRCodeReader(undefined, undefined);
     setDevicesList();
-    codeReader.decodeFromVideoDevice(
-      currentCamera,
-      videoRef.current!,
-      function (result, _, controls) {
-        if (mountedRef.current === false) {
-          controls.stop();
-          return;
+    if (videoRef.current) {
+      codeReader.decodeFromVideoDevice(
+        currentCamera,
+        videoRef.current,
+        function (result, _, controls) {
+          if (mountedRef.current === false) {
+            controls.stop();
+            return;
+          }
+          if (typeof result !== 'undefined') {
+            controls.stop();
+            onRead(result);
+          }
         }
-        if (typeof result !== 'undefined') {
-          controls.stop();
-          onRead(result);
-        }
-      }
-    );
+      );
+    }
     return function cleanup() {
       mountedRef.current = false;
     };
